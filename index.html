@@ -200,8 +200,8 @@ a:hover {
     // I trust Google will do no evils
     dataType: 'json',
     success: function(result) {
-	
-	  console.log(result);
+		html = template(result);
+	  //console.log(result);
       // If download was success, then apply rendering
       if (result.responseStatus === 200) {
 		console.log("200");
@@ -209,12 +209,14 @@ a:hover {
 		//console.log(result.responseText);
         //html = template(result.responseText.entries);
       } else {
+		console.log("error");
+		console.log(result);
         html = template(stub);
       }
     },
     error: function(result) {
+		console.log("error2");
 		console.log(result);
-		console.log(result.responseText);
 		html = template(stub);
 		//$('body').append('ERROR - ' + JSON.stringify(result));
     },
