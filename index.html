@@ -200,6 +200,8 @@ a:hover {
     // I trust Google will do no evils
     dataType: 'json',
     success: function(result) {
+	
+	  console.log(result);
       // If download was success, then apply rendering
       if (result.responseStatus === 200) {
 		console.log("200");
