@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang='en' class=''>
+
+<head>
+
+  <meta charset='UTF-8'>
+  <title>CodePen Demo</title>
+
+  <meta name="robots" content="noindex">
+
+
+  <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base target="_blank">
+  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+
+  <style class="INLINE_PEN_STYLESHEET_ID">
+    /* Responsive design, smallest device first */
+/* This is about the responsive concept and templating and have skipped adding classes for html elements and used id instead here and there for quicker prototyping */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin-top: 1em;
+}
+
+.date {
+  float: left;
+  font-size: 70%;
+}
+
+.author {
+  float: right;
+  font-size: 70%;
+}
+
+.gray {
+  color: gray;
+}
+
+.template-rendered {
+  margin: 0 auto;
+}
+
+#rendered ul {
+  list-style-type: none;
+}
+
+#rendered li {
+  display: block;
+  margin: 1em 0.5em 1em 0.5em;
+}
+
+#rendered li a {
+  display: block;
+  padding: 0.5em;
+  border: 1px solid black;
+  border-radius: 0.5em;
+}
+
+a:link,
+a:visited,
+a:hover,
+a:active {
+  text-decoration: none;
+}
+
+a:hover {
+  background: linear-gradient(white, #ddd);
+}
+
+#rendered .item-title {
+  clear: both;
+  margin: 0.5em 0;
+  margin-top: 1.2em;
+}
+
+#rendered .title {
+  text-align: center;
+}
+
+#rendered .title::after {
+  content: ' - Phone';
+}
+
+@media (min-width: 480px) {
+  #rendered .title::after {
+    content: ' - Phone large';
+  }
+  #rendered {
+    width: 96%;
+    font-size: 110%;
+  }
+}
+
+@media (min-width: 768px) {
+  #rendered .title::after {
+    content: " - Tablet";
+  }
+  #rendered {
+    width: 80%;
+    font-size: 120%;
+  }
+}
+
+@media (min-width: 992px) {
+  #rendered .title::after {
+    content: ' - Desktop';
+  }
+  #rendered {
+    width: 70%;
+    font-size: 130%;
+  }
+  #rendered li {
+    margin: 0.5em;
+  }
+}
+
+@media (min-width: 1200px) {
+  #rendered .title::after {
+    content: ' - Desktop large';
+  }
+  #rendered {
+    width: 60%;
+    font-size: 140%;
+  }
+}
+  </style>
+
+  
+</head>
+
+<body>
+  <section id='rendered' class='template-rendered'></section>
+
+<script id='template' type='text/x-handlebars-template'>
+  <h3 class='title'>Vaccine Bot NJ</h3>
+  <ul>
+    {{#entries}}
+    <li>
+      <a href='{{url}}' target='_blank'>
+        <div class='date gray'>{{url}}</div>
+        <div class='author gray'>{{status}}</div>
+        <div class='item-title'>{{[provider_name]}}</div>
+        <div class='gray'>Vaccine Type: {{categoriesFormat facilities}}</div>
+      </a>
+    </li>
+    {{/entries}}
+  </ul>
+</script>
+  
+<script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-157cd5b220a5c80d4ff8e0e70ac069bffd87a61252088146915e8726e5d9f147.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+<script src="https://bit.ly/njvaccinejson" id="data" type="application/json"></script>
+  <script >
+  ! function(d, $) {
+  var stub = {entries:[
+{ "provider_id":"CENTRASTATE", "provider_name":"CentraState Hospital", "url":"https://centrastatevac.wpengine.com/vaccine-update/", "restrictions":"No", "status":"Available", "found_count": 1, "found_type": "location", "facilities":[{"facility_id":"CENTRASTATE","facility_name":"CentraState Hospital","url":null,"found_count":1,"found_type":"location","vaccine_type":"Pfizer"}], "manually_tracked": true, "updatedt": "2021-05-04T22:50:01Z" }
+,{ "provider_id":"CVS", "provider_name":"CVS Pharmacy", "url":"https://www.cvs.com/vaccine/intake/store/cvd-schedule?icid=cvd_bstr_only", "restrictions":"", "status":"Available", "found_count": 207, "found_type": "location", "facilities":null, "source": "getmyvax", "updatedt": "2021-05-04T23:38:04Z" }
+,{ "provider_id":"WALMART", "provider_name":"Walmart", "url":"https://www.walmart.com/pharmacy/clinical-services/immunization/scheduled?imzType=covid", "restrictions":"", "status":"Available", "found_count": 2, "found_type": "location", "facilities":[{"facility_id":"WALMART-3159","facility_name":"Teterboro Supercenter - Teterboro, NJ 07608","url":null,"found_count":99,"found_type":"appt","vaccine_type":"Moderna"},{"facility_id":"WALMART-3266","facility_name":"East Windsor Store - East Windsor, NJ 08520","url":null,"found_count":63,"found_type":"appt","vaccine_type":"Janssen"}], "source": "vaccinespotter", "updatedt": "2021-05-04T23:26:35Z" }]};
+
+  // Aggregate string array to string
+  Handlebars.registerHelper('categoriesFormat', function(categories) {
+    if (!categories || categories.length === 0) return '';
+    if (categories.length === 1) return categories[0].vaccine_type;
+
+    return categories.reduce(function(a, b) {
+      if (a == null || "" + a == "")
+        {
+            return a + b.vaccine_type;
+        }
+      else
+        {
+          return a + " / " + b.vaccine_type;
+}
+    }, '');
+  });
+
+
+
+  var
+    templateSource = $('#template').html(),
+    template = Handlebars.compile(templateSource),
+    html = '',
+
+    // Json url
+    url = 'https://njvaccine.github.io/vaccinelistnj/data.json';
+
+  // Get json data from Google
+  $.ajax({
+    url: url,
+    type: 'GET',
+    // Avoid having no CORS policy issues by using jsonp
+    // I trust Google will do no evils
+    dataType: 'jsonp',
+    success: function(result) {
+      // If download was success, then apply rendering
+      if (result.responseStatus === 200) {
+		console.log(result.entries);
+        html = template(result.entries);
+      } else {
+        html = template(stub);
+      }
+    },
+    error: function(result) {
+		console.log(result);
+		html = template(stub);
+      $('body').append('ERROR - ' + JSON.stringify(result));
+    },
+    complete: function() {
+      $('#rendered').append(html);
+    }
+  });
+}(document, jQuery);
+  </script>
+</body>
+
+</html>
