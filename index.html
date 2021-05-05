@@ -202,14 +202,17 @@ a:hover {
     success: function(result) {
       // If download was success, then apply rendering
       if (result.responseStatus === 200) {
-		console.log(result.responseText.entries);
+		console.log("200");
+		console.log(result);
+		console.log(result.responseText);
         html = template(result.responseText.entries);
       } else {
         html = template(stub);
       }
     },
     error: function(result) {
-		console.log(result.responseText.entries);
+		console.log(result);
+		console.log(result.responseText);
 		html = template(stub);
 		//$('body').append('ERROR - ' + JSON.stringify(result));
     },
