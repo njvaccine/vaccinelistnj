@@ -198,14 +198,14 @@ a:hover {
     type: 'GET',
     // Avoid having no CORS policy issues by using jsonp
     // I trust Google will do no evils
-    dataType: 'jsonp',
+    dataType: 'json',
     success: function(result) {
       // If download was success, then apply rendering
       if (result.responseStatus === 200) {
 		console.log("200");
 		console.log(result);
-		console.log(result.responseText);
-        html = template(result.responseText.entries);
+		//console.log(result.responseText);
+        //html = template(result.responseText.entries);
       } else {
         html = template(stub);
       }
