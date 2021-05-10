@@ -97,7 +97,7 @@ clear:both;
 
 @media (min-width: 480px) {
 
-  #rendered {
+  #rendered, .toolbar {
     width: 96%;
     font-size: 100%;
   }
@@ -105,7 +105,7 @@ clear:both;
 
 @media (min-width: 768px) {
 
-  #rendered {
+  #rendered, .toolbar {
     width: 80%;
     font-size: 100%;
   }
@@ -113,7 +113,7 @@ clear:both;
 
 @media (min-width: 992px) {
 
-  #rendered {
+  #rendered, .toolbar {
     width: 70%;
     font-size: 100%;
   }
@@ -124,14 +124,47 @@ clear:both;
 
 @media (min-width: 1200px) {
 
-  #rendered {
+  #rendered, .toolbar {
     width: 60%;
     font-size: 100%;
   }
 }
 
-.title, .filter-list {
+.title {
 	text-align:center;
+}
+
+.ddlLabel {
+	min-width: 45px;
+	display:inline-block;
+}
+.filter, .sort {
+	min-width: 200px;
+}
+.toolbar {
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+}
+
+@media (min-width: 768px) {
+.toolbar {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding-left:10px;
+	padding-right:10px;
+	height: 20px;
+}
+.filter-list {
+	float:left;
+}
+.sort-list {
+	float:right;
+}
+}
+
+body {
+	margin-bottom: 100px;
 }
   </style>
 
@@ -142,8 +175,9 @@ clear:both;
 
 
   <h1 class='title'>Vaccine Bot NJ</h3>
+  <div class="toolbar"> 
 	<div class="filter-list">
-		<select name="filterCounty" id="filterCounty" class="filter">
+		<div class="ddlLabel">Filter:</div> <select name="filterCounty" id="filterCounty" class="filter">
 			<option value="">( All Counties )</option>
 			<option value="Atlantic">Atlantic County</option>
 			<option value="Bergen">Bergen County</option>
@@ -168,6 +202,13 @@ clear:both;
 			<option value="Warren">Warren County</option>
 		</select>
 	</div>
+	<div class="sort-list">
+		<div class="ddlLabel">Sort:</div> <select name="sortBy" id="sortBy" class="sort">
+			<option value="alpha">Alphabetical</option>
+			<option value="time">Most Recently Updated</option>
+		</select>
+	</div>
+</div>
   <section id='rendered' class='template-rendered'></section>
 
 <script id='template' type='text/x-handlebars-template'>
@@ -275,6 +316,7 @@ Handlebars.registerHelper('beautify_date', function(options) {
 		console.log(url);
 		jsonData = result;
 		jsonDataFiltered = result.availability;
+		jsonDataFiltered = sortJSON(jsonDataFiltered,'provider_name', 'asc');
 		//jsonDataFiltered = jsonData.availability.filter(element => element.county == "Somerset")
 		html = template(jsonDataFiltered);
     },
@@ -286,8 +328,25 @@ Handlebars.registerHelper('beautify_date', function(options) {
     }
   });
   
-  $( ".filter" ).change(function() {
   
+  function sortJSON(arr, key, way) {
+    return arr.sort(function(a, b) {
+        var x = a[key]; var y = b[key];
+        if (way === 'asc') { return ((x < y) ? -1 : ((x > y) ? 1 : 0)); }
+        if (way === 'desc') { return ((x > y) ? -1 : ((x < y) ? 1 : 0)); }
+    });
+}
+
+  
+$( ".filter" ).change(function() {
+	updateRendering();
+});
+
+$( ".sort" ).change(function() {
+	updateRendering();
+});
+
+function updateRendering() {
 	jsonDataFiltered = jsonData.availability;
 	
 	var countyFilter = "";
@@ -301,11 +360,26 @@ Handlebars.registerHelper('beautify_date', function(options) {
 		console.log("Filtering on county: " + countyFilter);
 		jsonDataFiltered = jsonDataFiltered.filter(element => element.county === countyFilter);
 	}
+	
+	
+	if ($("#sortBy option:selected").length > 0)
+		sortByValue = $("#sortBy option:selected")[0].value;
+		
+	if (sortByValue != "")
+	{
+		console.log("Sorting By: " + sortByValue);
+		
+		if (sortByValue == "alpha")
+			jsonDataFiltered = sortJSON(jsonDataFiltered,'provider_name', 'asc');
+		else if (sortByValue == "time")
+			jsonDataFiltered = sortJSON(jsonDataFiltered,'updated', 'desc');
+	}
 		
 	html = template(jsonDataFiltered);
 	$('#rendered').html("");
 	$('#rendered').html(html);
-	});
+}
+
   
 
 }(document, jQuery);
