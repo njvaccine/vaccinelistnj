@@ -4,16 +4,18 @@
 
 <head>
 
-  <meta charset='UTF-8'>
+  <meta charset='UTF-8' />
   <title>@nj_vaccine</title>
 
-  <meta name="robots" content="noindex">
+	<meta name="robots" content="noindex" />
 
 
-  <meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<base target="_blank">
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+	<base target="_blank" />
+	
   
 
   <style>
@@ -30,15 +32,15 @@ body {
   font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif;
 }
 
-.status {
+.updateago, .status {
   float: right;
   font-size: 70%;
-  color: white;
+  color: black;
   font-weight:bold;
   border-radius: 4px;
-  background-color:green;
-  background-color:red;
   padding:5px;
+}
+.status {
   display:none;
 }
 .status.Available{
@@ -64,6 +66,9 @@ body {
   padding: 0.5em;
   border: 1px solid black;
   border-radius: 0.5em;
+}
+#rendered li:hover {
+  background-color:#f2f5ff;
 }
 
 a:link,
@@ -124,31 +129,62 @@ clear:both;
     font-size: 100%;
   }
 }
+
+.title, .filter-list {
+	text-align:center;
+}
   </style>
 
   
 </head>
 
 <body>
+
+
+  <h1 class='title'>Vaccine Bot NJ</h3>
+	<div class="filter-list">
+		<select name="filterCounty" id="filterCounty" class="filter">
+			<option value="">( All Counties )</option>
+			<option value="Atlantic">Atlantic County</option>
+			<option value="Bergen">Bergen County</option>
+			<option value="Burlington">Burlington County</option>
+			<option value="Camden">Camden County</option>
+			<option value="Cape May">Cape May County</option>
+			<option value="Cumberland">Cumberland County</option>
+			<option value="Essex">Essex County</option>
+			<option value="Gloucester">Gloucester County</option>
+			<option value="Hudson">Hudson County</option>
+			<option value="Hunterdon">Hunterdon County</option>
+			<option value="Mercer">Mercer County</option>
+			<option value="Middlesex">Middlesex County</option>
+			<option value="Monmouth">Monmouth County</option>
+			<option value="Morris">Morris County</option>
+			<option value="Ocean">Ocean County</option>
+			<option value="Passaic">Passaic County</option>
+			<option value="Salem">Salem County</option>
+			<option value="Somerset">Somerset County</option>
+			<option value="Sussex">Sussex County</option>
+			<option value="Union">Union County</option>
+			<option value="Warren">Warren County</option>
+		</select>
+	</div>
   <section id='rendered' class='template-rendered'></section>
 
 <script id='template' type='text/x-handlebars-template'>
-  <h3 class='title'>Vaccine Bot NJ</h3>
   <ul>
     {{#each .}}	
-		{{#facilities}}
-			<li>
-				<div class='provider'>{{../provider_name}}</div>
-				<div class='status {{../status}}'>{{../status}}</div>
+			<li class="resultlist">
+				<div class='provider'>{{provider_name}}</div>
+				<div class='updateago'>{{#beautify_date}}{{updated}}{{/beautify_date}}</div>
+				
 				<div class='facility-name'>{{facility_name}}</div>
 				
 				<div>
 					{{#if (and (ne found_type "location"))}}{{found_count}} {{found_type}}{{#if (and (ne found_count 1))}}s{{/if}}{{/if}}
 					{{#if (and (ne vaccine_type "unknown"))}} {{#if (and (ne found_type "location"))}}- {{/if}}<span class="gray">{{vaccine_type}}</span>{{/if}}
 				</div>
-				<div class='siteurl'><a href="{{../url}}" target='_blank'>Make an appointment</a></div>
+				<div class='siteurl'><a href="{{url}}" target='_blank'>Make an appointment</a></div>
 			</li>
-		{{/facilities}}
     {{/each}}
   </ul>
 </script>
@@ -163,9 +199,9 @@ clear:both;
   
   ! function(d, $) {
   var stub = [
-{ "provider_id":"CENTRASTATE", "provider_name":"CentraState Hospital", "url":"https://centrastatevac.wpengine.com/vaccine-update/", "restrictions":"No", "status":"Available", "found_count": 1, "found_type": "location", "facilities":[{"facility_id":"CENTRASTATE","facility_name":"CentraState Hospital","url":null,"found_count":1,"found_type":"location","vaccine_type":"Pfizer"}], "manually_tracked": true, "updatedt": "2021-05-04T22:50:01Z" }
-,{ "provider_id":"CVS", "provider_name":"CVS Pharmacy", "url":"https://www.cvs.com/vaccine/intake/store/cvd-schedule?icid=cvd_bstr_only", "restrictions":"", "status":"Available", "found_count": 207, "found_type": "location", "facilities":null, "source": "getmyvax", "updatedt": "2021-05-04T23:38:04Z" }
-,{ "provider_id":"WALMART", "provider_name":"Walmart", "url":"https://www.walmart.com/pharmacy/clinical-services/immunization/scheduled?imzType=covid", "restrictions":"", "status":"Available", "found_count": 2, "found_type": "location", "facilities":[{"facility_id":"WALMART-3159","facility_name":"Teterboro Supercenter - Teterboro, NJ 07608","url":null,"found_count":99,"found_type":"appt","vaccine_type":"Moderna"},{"facility_id":"WALMART-3266","facility_name":"East Windsor Store - East Windsor, NJ 08520","url":null,"found_count":63,"found_type":"appt","vaccine_type":"Janssen"}], "source": "vaccinespotter", "updatedt": "2021-05-04T23:26:35Z" }];
+{ "provider_id":"CENTRASTATE", "provider_name":"CentraState Hospital", "url":"https://centrastatevac.wpengine.com/vaccine-update/", "restrictions":"No", "status":"Available", "found_count": 1, "found_type": "location", "facilities":[{"facility_id":"CENTRASTATE","facility_name":"CentraState Hospital","url":null,"found_count":1,"found_type":"location","vaccine_type":"Pfizer"}], "manually_tracked": true, "updatedt": "2021-05-05T14:30:01Z" }
+,{ "provider_id":"CVS", "provider_name":"CVS Pharmacy", "url":"https://www.cvs.com/vaccine/intake/store/cvd-schedule?icid=cvd_bstr_only", "restrictions":"", "status":"Available", "found_count": 207, "found_type": "location", "facilities":null, "source": "getmyvax", "updatedt": "2021-05-05T14:38:04Z" }
+,{ "provider_id":"WALMART", "provider_name":"Walmart", "url":"https://www.walmart.com/pharmacy/clinical-services/immunization/scheduled?imzType=covid", "restrictions":"", "status":"Available", "found_count": 2, "found_type": "location", "facilities":[{"facility_id":"WALMART-3159","facility_name":"Teterboro Supercenter - Teterboro, NJ 07608","url":null,"found_count":99,"found_type":"appt","vaccine_type":"Moderna"},{"facility_id":"WALMART-3266","facility_name":"East Windsor Store - East Windsor, NJ 08520","url":null,"found_count":63,"found_type":"appt","vaccine_type":"Janssen"}], "source": "vaccinespotter", "updatedt": "2021-05-05T14:26:35Z" }];
   
 Handlebars.registerHelper({
     eq: (v1, v2) => v1 === v2,
@@ -182,6 +218,44 @@ Handlebars.registerHelper({
     }
 });
 
+Handlebars.registerHelper('beautify_date', function(options) {
+        var timeAgo = new Date(options.fn(this));
+		
+        if (Object.prototype.toString.call(timeAgo) === "[object Date]") {
+            if (isNaN(timeAgo.getTime())) {
+                return 'Not Valid';
+            } else {
+                var seconds = Math.floor((new Date() - timeAgo) / 1000),
+                intervals = [
+                    Math.floor(seconds / 31536000),
+                    Math.floor(seconds / 2592000),
+                    Math.floor(seconds / 86400),
+                    Math.floor(seconds / 3600),
+                    Math.floor(seconds / 60)
+                ],
+                times = [
+                    'year',
+                    'month',
+                    'day',
+                    'hour',
+                    'minute'
+                ];
+
+                var key;
+                for(key in intervals) {
+                    if (intervals[key] > 1)  
+                        return intervals[key] + ' ' + times[key] + 's ago';
+                    else if (intervals[key] === 1) 
+                        return intervals[key] + ' ' + times[key] + ' ago';
+                }
+
+                return Math.floor(seconds) + ' seconds ago';
+            }
+        } else {
+            return 'Not Valid';
+        }
+    });
+
 
 
   var
@@ -189,23 +263,17 @@ Handlebars.registerHelper({
     template = Handlebars.compile(templateSource),
     html = '',
 
-    // Json url
     url = 'https://njvaccine.github.io/vaccinelistnj/data.json';
 
-  // Get json data from Google
+
   $.ajax({
     url: url,
     type: 'GET',
-    // Avoid having no CORS policy issues by using jsonp
-    // I trust Google will do no evils
     dataType: 'json',
     success: function(result) {
 		jsonData = result;
-		jsonDataFiltered = jsonData.filter(element => element.status === "Available");
-		//html = template(stub);
+		jsonDataFiltered = jsonData.availability.filter(element => element.county == "Somerset")
 		html = template(jsonDataFiltered);
-		//var filtered = result.filter(element => element.status == "Available");
-		//html = template(filtered);
     },
     error: function(result) {
 		html = template(stub);
@@ -214,7 +282,33 @@ Handlebars.registerHelper({
       $('#rendered').append(html);
     }
   });
+  
+  $( ".filter" ).change(function() {
+  
+	jsonDataFiltered = jsonData.availability;
+	
+	var countyFilter = "";
+	
+	if ($("#filterCounty option:selected").length > 0)
+		countyFilter = $("#filterCounty option:selected")[0].value;
+	
+	
+	if (countyFilter != "")
+	{
+		console.log("Filtering on county: " + countyFilter);
+		jsonDataFiltered = jsonDataFiltered.filter(element => element.county === countyFilter);
+	}
+		
+	html = template(jsonDataFiltered);
+	$('#rendered').html("");
+	$('#rendered').html(html);
+	});
+  
+
 }(document, jQuery);
+
+
+ -->
   </script>
 </body>
 
