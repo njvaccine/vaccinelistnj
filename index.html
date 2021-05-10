@@ -264,7 +264,7 @@ Handlebars.registerHelper('beautify_date', function(options) {
     template = Handlebars.compile(templateSource),
     html = '',
 
-    url = 'https://njvaccine.github.io/vaccinelistnj/data.json';
+    url = 'https://njvaccine.github.io/vaccinelistnj/data.json?nocache=' + Math.random();
 
 
   $.ajax({
@@ -272,6 +272,7 @@ Handlebars.registerHelper('beautify_date', function(options) {
     type: 'GET',
     dataType: 'json',
     success: function(result) {
+		console.log(url);
 		jsonData = result;
 		jsonDataFiltered = result.availability;
 		//jsonDataFiltered = jsonData.availability.filter(element => element.county == "Somerset")
