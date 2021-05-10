@@ -223,6 +223,7 @@ Handlebars.registerHelper('beautify_date', function(options) {
 		
         if (Object.prototype.toString.call(timeAgo) === "[object Date]") {
             if (isNaN(timeAgo.getTime())) {
+				console.log("date error");
                 return 'Not Valid';
             } else {
                 var seconds = Math.floor((new Date() - timeAgo) / 1000),
@@ -272,7 +273,8 @@ Handlebars.registerHelper('beautify_date', function(options) {
     dataType: 'json',
     success: function(result) {
 		jsonData = result;
-		jsonDataFiltered = jsonData.availability.filter(element => element.county == "Somerset")
+		jsonDataFiltered = result.availability;
+		//jsonDataFiltered = jsonData.availability.filter(element => element.county == "Somerset")
 		html = template(jsonDataFiltered);
     },
     error: function(result) {
