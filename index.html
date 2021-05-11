@@ -32,7 +32,7 @@ body {
   font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif;
 }
 
-.updateago, .status {
+.updateago, .status, .milesaway {
   float: right;
   font-size: 70%;
   color: black;
@@ -135,8 +135,9 @@ clear:both;
 }
 
 .ddlLabel {
-	min-width: 45px;
+	min-width: 120px;
 	display:inline-block;
+	text-align:left;
 }
 .filter, .sort {
 	min-width: 200px;
@@ -147,27 +148,53 @@ clear:both;
 	text-align:center;
 }
 
-@media (min-width: 768px) {
-.toolbar {
-	margin-top: 20px;
-	margin-bottom: 20px;
-	padding-left:10px;
-	padding-right:10px;
-	height: 20px;
-}
-.filter-list {
-	float:left;
-}
-.sort-list {
-	float:right;
-}
+@media (min-width: 900px) {
+	.toolbar {
+		margin-top: 20px;
+		margin-bottom: 20px;
+		padding-left:10px;
+		padding-right:10px;
+		height: 60px;
+	}
+	.filter-list {
+		float:left;
+	}
+	.sort-list {
+		float:right;
+	}
+	.sort-list .ddlLabel {
+		text-align:right;
+	}
 }
 
 body {
 	margin-bottom: 100px;
 }
   </style>
-
+  <script>
+	function distance(lat1, lon1, lat2, lon2, unit) {
+		if ((lat1 == lat2) && (lon1 == lon2)) {
+			return 0;
+		}
+		else {
+			//console.log(lat1, lon1, lat2, lon2);
+			var radlat1 = Math.PI * lat1/180;
+			var radlat2 = Math.PI * lat2/180;
+			var theta = lon1-lon2;
+			var radtheta = Math.PI * theta/180;
+			var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+			if (dist > 1) {
+				dist = 1;
+			}
+			dist = Math.acos(dist);
+			dist = dist * 180/Math.PI;
+			dist = dist * 60 * 1.1515;
+			if (unit=="K") { dist = dist * 1.609344 }
+			if (unit=="N") { dist = dist * 0.8684 }
+			return dist;
+		}
+	}
+  </script>
   
 </head>
 
@@ -177,8 +204,9 @@ body {
   <h1 class='title'>Vaccine Bot NJ</h3>
   <div class="toolbar"> 
 	<div class="filter-list">
-		<div class="ddlLabel">Filter:</div> <select name="filterCounty" id="filterCounty" class="filter">
-			<option value="">( All Counties )</option>
+		<div class="ddlLabel">County:</div>
+		<select name="filterCounty" id="filterCounty" class="filter">
+			<option value="">( all counties )</option>
 			<option value="Atlantic">Atlantic County</option>
 			<option value="Bergen">Bergen County</option>
 			<option value="Burlington">Burlington County</option>
@@ -201,11 +229,28 @@ body {
 			<option value="Union">Union County</option>
 			<option value="Warren">Warren County</option>
 		</select>
+		<div style="height:5px;"></div>
+		<div class="ddlLabel">Zip Code:</div>
+		<input type="text" name="filterZip" id="filterZip" class="filter" watermark="(any zip)" />
+		<input type="text" name="filterLat" id="filterLat" value="" style="display:none;"></input>
+		<input type="text" name="filterLong" id="filterLong" value="" style="display:none;"></input>
+		<div style="height:5px;"></div>
+		<div class="ddlLabel">Vaccine:</div>
+		<select name="filterVaccine" id="filterVaccine" class="filter">
+			<option value="">( any vaccine )</option>
+			<option value="PFIZER">Pfizer</option>
+			<option value="MODERNA">Moderna</option>
+			<option value="JANSSEN">Janssen (J&J)</option>
+			<option value="UNKNOWN">Unknown</option>
+		</select>
 	</div>
+	
 	<div class="sort-list">
-		<div class="ddlLabel">Sort:</div> <select name="sortBy" id="sortBy" class="sort">
-			<option value="alpha">Alphabetical</option>
-			<option value="time">Most Recently Updated</option>
+		<div class="ddlLabel">Sort:</div>
+		<select name="sortBy" id="sortBy" class="sort">
+			<option value="alpha">Sort alphabetically</option>
+			<option value="time">Sort by most recent</option>
+			<option value="distance">Sort by distance</option>
 		</select>
 	</div>
 </div>
@@ -224,7 +269,11 @@ body {
 					{{#if (and (ne found_type "location"))}}{{found_count}} {{found_type}}{{#if (and (ne found_count 1))}}s{{/if}}{{/if}}
 					{{#if (and (ne vaccine_type "unknown"))}} {{#if (and (ne found_type "location"))}}- {{/if}}<span class="gray">{{vaccine_type}}</span>{{/if}}
 				</div>
+				
+				<div class='milesaway'>{{distance_string}}</div>
+				
 				<div class='siteurl'><a href="{{url}}" target='_blank'>Make an appointment</a></div>
+				
 			</li>
     {{/each}}
   </ul>
@@ -236,6 +285,7 @@ body {
   
   var jsonData = [{"empty":"empty"}];
   var jsonDataFiltered = [{"empty":"empty"}];
+  var jsonZipData = [{"empty":"empty"}];
   
   
   ! function(d, $) {
@@ -306,81 +356,180 @@ Handlebars.registerHelper('beautify_date', function(options) {
     html = '',
 
     url = 'https://njvaccine.github.io/vaccinelistnj/data.json?nocache=' + Math.random();
+	zipurl = 'https://njvaccine.github.io/vaccinelistnj/zipdata.json';
 
 
-  $.ajax({
-    url: url,
-    type: 'GET',
-    dataType: 'json',
-    success: function(result) {
-		console.log(url);
-		jsonData = result;
-		jsonDataFiltered = result.availability;
-		jsonDataFiltered = sortJSON(jsonDataFiltered,'provider_name', 'asc');
-		//jsonDataFiltered = jsonData.availability.filter(element => element.county == "Somerset")
-		html = template(jsonDataFiltered);
-    },
-    error: function(result) {
-		html = template(stub);
-    },
-    complete: function() {
-      $('#rendered').append(html);
-    }
-  });
-  
-  
-  function sortJSON(arr, key, way) {
-    return arr.sort(function(a, b) {
-        var x = a[key]; var y = b[key];
-        if (way === 'asc') { return ((x < y) ? -1 : ((x > y) ? 1 : 0)); }
-        if (way === 'desc') { return ((x > y) ? -1 : ((x < y) ? 1 : 0)); }
-    });
-}
-
-  
-$( ".filter" ).change(function() {
-	updateRendering();
-});
-
-$( ".sort" ).change(function() {
-	updateRendering();
-});
-
-function updateRendering() {
-	jsonDataFiltered = jsonData.availability;
-	
-	var countyFilter = "";
-	
-	if ($("#filterCounty option:selected").length > 0)
-		countyFilter = $("#filterCounty option:selected")[0].value;
-	
-	
-	if (countyFilter != "")
-	{
-		console.log("Filtering on county: " + countyFilter);
-		jsonDataFiltered = jsonDataFiltered.filter(element => element.county === countyFilter);
-	}
-	
-	
-	if ($("#sortBy option:selected").length > 0)
-		sortByValue = $("#sortBy option:selected")[0].value;
-		
-	if (sortByValue != "")
-	{
-		console.log("Sorting By: " + sortByValue);
-		
-		if (sortByValue == "alpha")
+	$.ajax({
+		url: url,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			//console.log(url);
+			jsonData = result;
+			jsonDataFiltered = result.availability;
 			jsonDataFiltered = sortJSON(jsonDataFiltered,'provider_name', 'asc');
-		else if (sortByValue == "time")
-			jsonDataFiltered = sortJSON(jsonDataFiltered,'updated', 'desc');
-	}
-		
-	html = template(jsonDataFiltered);
-	$('#rendered').html("");
-	$('#rendered').html(html);
-}
-
+			html = template(jsonDataFiltered);
+		},
+		error: function(result) {
+			html = template(stub);
+		},
+		complete: function() {
+			$('#rendered').append(html);
+		}
+	});
   
+	$.ajax({
+		url: zipurl,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			jsonZipData = result;
+		},
+		error: function(result) {
+			
+		},
+		complete: function() {
+		  
+		}
+	});
+  
+  
+	function sortJSON(arr, key, way) {
+		return arr.sort(function(a, b) {
+			var x = a[key]; var y = b[key];
+			if (way === 'asc') { return ((x < y) ? -1 : ((x > y) ? 1 : 0)); }
+			if (way === 'desc') { return ((x > y) ? -1 : ((x < y) ? 1 : 0)); }
+		});
+	}
+	
+	$( "input.filter" ).keyup(
+		function() {
+			var zipval = document.querySelector("#filterZip").value;
+			
+			if (zipval.length == 5)
+				updateLatLong();
+		}
+	);
+  
+	$( "select.filter" ).change(
+		function() {
+			console.log('select filter - rerender');
+			updateRendering();
+		}
+	);
+
+	$( ".sort" ).change(
+		function() 
+		{
+			console.log('sort - rerender');
+			updateRendering();
+		}
+	);
+	
+	function updateLatLong() {
+		var zipval = document.querySelector("#filterZip").value;
+		if (zipval == "")
+		{
+			console.log("no zip");
+			return;
+		}
+		var zipfilter = jsonZipData.filter(x => x.zip===zipval);
+		if (zipfilter == null || zipfilter.length < 1)
+		{
+			alert("Invalid zip code.");
+			return;
+		}
+		document.querySelector("#filterLat").value = zipfilter[0]["latitude"];
+		document.querySelector("#filterLong").value = zipfilter[0]["longitude"];
+		console.log(document.querySelector("#filterLat").value, document.querySelector("#filterLong").value);
+		
+		console.log('updateLatLong - rerender');
+		updateRendering();
+	}
+
+	function updateRendering() 
+	{
+		jsonDataFiltered = jsonData.availability;
+		
+		var countyFilter = "";
+		
+		if ($("#filterCounty option:selected").length > 0)
+		{
+			countyFilter = $("#filterCounty option:selected")[0].value;
+		}
+		
+		if (countyFilter != "") 
+		{
+			console.log("Filtering on county: " + countyFilter);
+			
+			jsonDataFiltered = jsonDataFiltered.filter(element => element.county === countyFilter);
+		}
+		
+		
+		var vaccineFilter = "";
+		
+		if ($("#filterVaccine option:selected").length > 0)
+		{
+			vaccineFilter = $("#filterVaccine option:selected")[0].value;
+		}
+		
+		if (vaccineFilter != "") 
+		{
+			console.log("Filtering on vaccine: " + vaccineFilter);
+			
+			jsonDataFiltered = jsonDataFiltered.filter(element => element.vaccine_type.toUpperCase().includes(vaccineFilter));;
+		}
+		
+		if (document.querySelector("#filterZip").value != "") 
+		{
+			for (let a of Object.entries(jsonDataFiltered)) 
+			{
+				if (a != null && a[1] != null) 
+				{
+					
+					var obj = a[1];
+					
+					obj["distance"] = distance(document.querySelector("#filterLat").value, document.querySelector("#filterLong").value, obj["latitude"], obj["longitude"], "M");
+					
+					if (obj["distance"] != null) 
+					{
+						obj["distance_string"] = (obj["distance"]).toFixed(1) + " mi";
+					}
+					//console.log(obj["facility_name"] + " - " + obj["distance_string"]);
+				}
+			}
+		}
+	
+		if ($("#sortBy option:selected").length > 0)
+			sortByValue = $("#sortBy option:selected")[0].value;
+		
+		if (sortByValue != "")
+		{
+			if (document.querySelector("#filterZip").value == "")
+			{
+				sortByValue = "alpha";
+			}
+				
+			console.log("Sorting By: " + sortByValue);
+			
+			if (sortByValue == "alpha")
+			{
+				jsonDataFiltered = sortJSON(jsonDataFiltered,'provider_name', 'asc');
+			}
+			else if (sortByValue == "time")
+			{
+				jsonDataFiltered = sortJSON(jsonDataFiltered,'updated', 'desc');
+			}
+			else if (sortByValue == "distance") 
+			{
+				jsonDataFiltered = sortJSON(jsonDataFiltered,'distance', 'asc');
+			}
+		}
+		
+		html = template(jsonDataFiltered);
+		$('#rendered').html("");
+		$('#rendered').html(html);
+	}
 
 }(document, jQuery);
 
