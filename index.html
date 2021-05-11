@@ -148,6 +148,10 @@ clear:both;
 	text-align:center;
 }
 
+.sort-list {
+	padding-top:5px;
+}
+
 @media (min-width: 900px) {
 	.toolbar {
 		margin-top: 20px;
@@ -161,9 +165,19 @@ clear:both;
 	}
 	.sort-list {
 		float:right;
+		padding-top:0;
 	}
 	.sort-list .ddlLabel {
 		text-align:right;
+	}
+}
+
+@media (max-width: 899px) {
+	.filter-list, .sort-list {
+		font-size: 110%;
+	}
+	.filter-list select, .sort-list select, .filter-list input, .sort-list input {
+		height: 30px;
 	}
 }
 
@@ -206,7 +220,7 @@ body {
 	<div class="filter-list">
 		<div class="ddlLabel">County:</div>
 		<select name="filterCounty" id="filterCounty" class="filter">
-			<option value="">( all counties )</option>
+			<option value="">(all counties)</option>
 			<option value="Atlantic">Atlantic County</option>
 			<option value="Bergen">Bergen County</option>
 			<option value="Burlington">Burlington County</option>
@@ -231,13 +245,13 @@ body {
 		</select>
 		<div style="height:5px;"></div>
 		<div class="ddlLabel">Zip Code:</div>
-		<input type="text" name="filterZip" id="filterZip" class="filter" watermark="(any zip)" />
+		<input type="text" name="filterZip" id="filterZip" class="filter" placeholder="(any zip)" />
 		<input type="text" name="filterLat" id="filterLat" value="" style="display:none;"></input>
 		<input type="text" name="filterLong" id="filterLong" value="" style="display:none;"></input>
 		<div style="height:5px;"></div>
 		<div class="ddlLabel">Vaccine:</div>
 		<select name="filterVaccine" id="filterVaccine" class="filter">
-			<option value="">( any vaccine )</option>
+			<option value="">(any vaccine)</option>
 			<option value="PFIZER">Pfizer</option>
 			<option value="MODERNA">Moderna</option>
 			<option value="JANSSEN">Janssen (J&J)</option>
@@ -248,9 +262,9 @@ body {
 	<div class="sort-list">
 		<div class="ddlLabel">Sort:</div>
 		<select name="sortBy" id="sortBy" class="sort">
-			<option value="alpha">Sort alphabetically</option>
-			<option value="time">Sort by most recent</option>
-			<option value="distance">Sort by distance</option>
+			<option value="alpha">Alphabetically</option>
+			<option value="time">Most recent</option>
+			<option value="distance">Distance</option>
 		</select>
 	</div>
 </div>
