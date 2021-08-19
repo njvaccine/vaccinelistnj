@@ -31,6 +31,13 @@ body {
   margin-top: 1em;
   font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif;
 }
+	  
+ input[type='text'], select {
+    border: solid 1px #dbdbdb;
+    border-radius: .375em;
+    color: #363636;
+    height: 2em;
+}
 
 .updateago, .status, .milesaway {
   float: right;
@@ -64,8 +71,9 @@ body {
   display: block;
   margin: 1em 0.5em 1em 0.5em;  
   padding: 0.5em;
-  border: 1px solid black;
+  /*border: 1px solid black;*/
   border-radius: 0.5em;
+  box-shadow: 3px 3px 10px rgb(0 0 0 / 14%);
 }
 #rendered li:hover {
   background-color:#f2f5ff;
@@ -155,7 +163,7 @@ clear:both;
 @media (min-width: 900px) {
 	.toolbar {
 		margin-top: 20px;
-		margin-bottom: 20px;
+		margin-bottom: 50px;
 		padding-left:10px;
 		padding-right:10px;
 		height: 60px;
